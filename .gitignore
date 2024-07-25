@@ -1,0 +1,7 @@
+node_modules
+.env.development
+.env.production
+src/appcopy3.js
+src/appcopy.js
+src/appcopy2.js
+src/config/configcopy.js
