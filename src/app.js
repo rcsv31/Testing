@@ -5,11 +5,13 @@ import cookieParser from "cookie-parser";
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
 import expressCompression from "express-compression";
-import config from "./config/config.js"; // Ajusta la ruta si es necesario
+import config from "./config/config.js";
 import createSessionMiddleware from "./middlewares/session.js";
 import { addLogger, logger } from "./utils/logger.js";
 import MessageModel from "./models/message.model.js";
 import "./database.js"; // Importar el archivo de conexión
+import swaggerJSDoc from "swagger-jsdoc";
+import swaggerUiExpress from "swagger-ui-express";
 
 const app = express();
 
@@ -84,3 +86,17 @@ io.on("connection", (socket) => {
     io.sockets.emit("message", messages);
   });
 });
+
+const swaggerOptions = {
+  definition: {
+    openapi: "3.0.1",
+    info: {
+      title: "Documentacion de la Api",
+      desription: "App dedicada a la administración de productos",
+    },
+  },
+  apis: ["./src/docs/**/*.yaml"],
+};
+
+const specs = swaggerJSDoc(swaggerOptions);
+app.use("/apidocs", swaggerUiExpress.serve, swaggerUiExpress.setup(specs));

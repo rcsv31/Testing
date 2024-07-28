@@ -5,3 +5,12 @@ src/appcopy3.js
 src/appcopy.js
 src/appcopy2.js
 src/config/configcopy.js
+src/docs/Users/Users copy.yaml
+src/controllers/cart.controller copy.js
+src/config/configcopy.js
+src/dto/carts.dto copy.js
+src/models/cart.model copy.js
+src/repositories/cart.repository copy.js
+src/routes/carts.router copy.js
+src/test/users.test.js
+src/test/usersChai.test.js

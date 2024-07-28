@@ -1,0 +1,189 @@
+paths:
+  /api/users:
+    get:
+      summary: Obtener todos los usuarios
+      tags:
+        - Users
+      responses:
+        200:
+          description: Se obtienen todos los usuarios correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+        500:
+          description: Error interno del servidor
+    post:
+      summary: Crear un nuevo usuario
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateUser"
+      responses:
+        201:
+          description: Usuario creado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        400:
+          description: Error en la solicitud (datos inválidos)
+        500:
+          description: Error interno del servidor
+  /api/users/{id}:
+    get:
+      summary: Obtener un usuario por su ID
+      tags:
+        - Users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID del usuario
+      responses:
+        200:
+          description: Usuario encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        404:
+          description: Usuario no encontrado
+        500:
+          description: Error interno del servidor
+  /api/users/{id}/role:
+    patch:
+      summary: Cambiar el rol de un usuario
+      tags:
+        - Users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID del usuario
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  description: Nuevo rol del usuario
+                  enum: [admin, usuario, premium]
+      responses:
+        200:
+          description: Rol del usuario actualizado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        400:
+          description: Rol no válido o datos inválidos
+        404:
+          description: Usuario no encontrado
+        500:
+          description: Error interno del servidor
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID autogenerado por MongoDB
+        first_name:
+          type: string
+          description: Nombre del usuario
+        last_name:
+          type: string
+          description: Apellido del usuario
+        email:
+          type: string
+          description: Correo electrónico del usuario
+        password:
+          type: string
+          description: Contraseña del usuario
+        age:
+          type: integer
+          description: Edad del usuario
+        role:
+          type: string
+          description: Rol del usuario
+          enum:
+            - admin
+            - usuario
+            - premium
+        cart:
+          type: string
+          description: ID del carrito de compras asociado
+        resetToken:
+          type: object
+          properties:
+            token:
+              type: string
+              description: Token para restablecer la contraseña
+            expire:
+              type: string
+              format: date-time
+              description: Fecha de expiración del token
+      required:
+        - first_name
+        - last_name
+        - email
+        - password
+        - age
+        - role
+      example:
+        _id: "60b8d6c1f79c7c0015e5c8e7"
+        first_name: Juan
+        last_name: Perez
+        email: juan.perez@example.com
+        password: $2b$10$7dJJYIvYz7jzKsU3K5bLze1Q44lO/ZzLk3J5Z4nZDz6XyWwzY/UgK
+        age: 25
+        role: usuario
+        cart: "60b8d6c1f79c7c0015e5c8e8"
+        resetToken:
+          token: abc123def456
+          expire: 2024-07-29T17:45:00Z
+    CreateUser:
+      type: object
+      properties:
+        first_name:
+          type: string
+          description: Nombre del usuario
+        last_name:
+          type: string
+          description: Apellido del usuario
+        email:
+          type: string
+          description: Correo electrónico del usuario
+        password:
+          type: string
+          description: Contraseña del usuario
+        age:
+          type: integer
+          description: Edad del usuario
+      required:
+        - first_name
+        - last_name
+        - email
+        - password
+        - age
+      example:
+        first_name: Maria
+        last_name: Rodrigo
+        email: maria.rodrigo@example.com
+        password: 123456
+        age: 30

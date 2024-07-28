@@ -1,0 +1,185 @@
+openapi: 3.0.0
+info:
+  title: API de Carritos
+  description: API para la gestión de carritos de compras
+  version: 1.0.0
+paths:
+  /api/carts:
+    get:
+      summary: Obtener todos los carritos
+      tags:
+        - Carts
+      responses:
+        200:
+          description: Lista de carritos obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Cart"
+        500:
+          description: Error interno del servidor
+    post:
+      summary: Crear un nuevo carrito
+      tags:
+        - Carts
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCart"
+      responses:
+        201:
+          description: Carrito creado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+        400:
+          description: Datos de entrada inválidos
+        500:
+          description: Error interno del servidor
+  /api/carts/{id}:
+    get:
+      summary: Obtener un carrito por su ID
+      tags:
+        - Carts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID del carrito
+      responses:
+        200:
+          description: Carrito encontrado
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+        404:
+          description: Carrito no encontrado
+        500:
+          description: Error interno del servidor
+    put:
+      summary: Actualizar un carrito
+      tags:
+        - Carts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID del carrito
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCart"
+      responses:
+        200:
+          description: Carrito actualizado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Cart"
+        400:
+          description: Datos de entrada inválidos
+        404:
+          description: Carrito no encontrado
+        500:
+          description: Error interno del servidor
+    delete:
+      summary: Eliminar un carrito
+      tags:
+        - Carts
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID del carrito
+      responses:
+        200:
+          description: Carrito eliminado correctamente
+        404:
+          description: Carrito no encontrado
+        500:
+          description: Error interno del servidor
+components:
+  schemas:
+    Cart:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: ID autogenerado del carrito
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              productId:
+                type: string
+                description: ID del producto
+              quantity:
+                type: integer
+                description: Cantidad del producto en el carrito
+          description: Lista de productos en el carrito
+      example:
+        _id: "60b8d6c1f79c7c0015e5c8e9"
+        products:
+          - productId: "60b8d6c1f79c7c0015e5c8e9"
+            quantity: 2
+          - productId: "60b8d6c1f79c7c0015e5c8e8"
+            quantity: 1
+    CreateCart:
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              productId:
+                type: string
+                description: ID del producto
+              quantity:
+                type: integer
+                description: Cantidad del producto
+      required:
+        - products
+      example:
+        products:
+          - productId: "60b8d6c1f79c7c0015e5c8e9"
+            quantity: 1
+          - productId: "60b8d6c1f79c7c0015e5c8e8"
+            quantity: 3
+    UpdateCart:
+      type: object
+      properties:
+        products:
+          type: array
+          items:
+            type: object
+            properties:
+              productId:
+                type: string
+                description: ID del producto
+              quantity:
+                type: integer
+                description: Cantidad del producto
+      required:
+        - products
+      example:
+        products:
+          - productId: "60b8d6c1f79c7c0015e5c8e9"
+            quantity: 4
+          - productId: "60b8d6c1f79c7c0015e5c8e8"
+            quantity: 2

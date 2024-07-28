@@ -2,15 +2,18 @@ import cartService from "../services/cart.service.js";
 import errorMessages from "../services/errors/custom-error.js";
 import { PurchaseCartDTO } from "../dto/carts.dto.js";
 
+const handleErrorResponse = (res, error, defaultMessage, statusCode = 500) => {
+  const errorMessage = errorMessages.cartErrors[error.code] || defaultMessage;
+  res.status(statusCode).json({ error: errorMessage });
+};
+
 export const createCart = async (req, res) => {
   try {
     const createCartDTO = new CreateCartDTO(req.body);
     const newCart = await cartService.createCart(createCartDTO);
     res.status(201).json(newCart);
   } catch (error) {
-    const errorMessage =
-      errorMessages.cartErrors[error.code] || "Error desconocido.";
-    res.status(400).json({ error: errorMessage });
+    handleErrorResponse(res, error, "Error al crear el carrito.");
   }
 };
 
@@ -19,9 +22,7 @@ export const getCartById = async (req, res) => {
     const cart = await cartService.getCartById(req.params.id);
     res.render("carts", { cart });
   } catch (error) {
-    const errorMessage =
-      errorMessages.cartErrors[error.code] || "Error desconocido.";
-    res.status(404).json({ error: errorMessage });
+    handleErrorResponse(res, error, "Error al obtener el carrito.", 404);
   }
 };
 
@@ -34,9 +35,7 @@ export const updateCart = async (req, res) => {
     );
     res.render("carts", { cart: updatedCart });
   } catch (error) {
-    const errorMessage =
-      errorMessages.cartErrors[error.code] || "Error desconocido.";
-    res.status(400).json({ error: errorMessage });
+    handleErrorResponse(res, error, "Error al actualizar el carrito.");
   }
 };
 
@@ -45,7 +44,7 @@ export const deleteCart = async (req, res) => {
     await cartService.deleteCart(req.params.id);
     res.render("carts", { message: "Carrito eliminado con éxito" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    handleErrorResponse(res, error, "Error al eliminar el carrito.");
   }
 };
 
@@ -54,7 +53,7 @@ export const getCarts = async (req, res) => {
     const carts = await cartService.getCarts();
     res.render("carts", { carts });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    handleErrorResponse(res, error, "Error al obtener los carritos.");
   }
 };
 
@@ -69,9 +68,11 @@ export const getProductsFromCart = async (req, res) => {
       res.render("carts", { cart });
     }
   } catch (error) {
-    const errorMessage =
-      errorMessages.cartErrors[error.code] || "Error desconocido.";
-    res.status(500).json({ error: errorMessage });
+    handleErrorResponse(
+      res,
+      error,
+      "Error al obtener los productos del carrito."
+    );
   }
 };
 
@@ -84,9 +85,7 @@ export const addProductToCart = async (req, res) => {
     );
     res.render("carts", { cart });
   } catch (error) {
-    const errorMessage =
-      errorMessages.cartErrors[error.code] || "Error desconocido.";
-    res.status(500).json({ error: errorMessage });
+    handleErrorResponse(res, error, "Error al añadir producto al carrito.");
   }
 };
 
@@ -99,9 +98,11 @@ export const deleteProductById = async (req, res) => {
     );
     res.render("carts", { cart });
   } catch (error) {
-    const errorMessage =
-      errorMessages.cartErrors[error.code] || "Error desconocido.";
-    res.status(500).json({ error: errorMessage });
+    handleErrorResponse(
+      res,
+      error,
+      "Error al eliminar el producto del carrito."
+    );
   }
 };
 
@@ -110,9 +111,7 @@ export const clearCart = async (req, res) => {
     const cart = await cartService.clearCart(req.params.id);
     res.render("carts", { cart });
   } catch (error) {
-    const errorMessage =
-      errorMessages.cartErrors[error.code] || "Error desconocido.";
-    res.status(500).json({ error: errorMessage });
+    handleErrorResponse(res, error, "Error al vaciar el carrito.");
   }
 };
 
@@ -125,15 +124,12 @@ export const purchaseCart = async (req, res) => {
     );
 
     if (result.success) {
-      // Generar ticket con los datos de la compra
       const ticket = await ticketService.generateTicket(
         result.cart,
         result.purchaseDateTime
       );
 
-      // Limpiar el carrito después de la compra
       const updatedCart = await cartService.clearCart(req.params.cid);
-
       res.render("ticket", { ticket });
     } else {
       res
@@ -141,8 +137,6 @@ export const purchaseCart = async (req, res) => {
         .json({ productsNotProcessed: result.productsNotProcessed });
     }
   } catch (error) {
-    const errorMessage =
-      errorMessages.commonErrors[error.code] || "Error desconocido.";
-    res.status(500).json({ error: errorMessage });
+    handleErrorResponse(res, error, "Error al realizar la compra.");
   }
 };
